@@ -7,8 +7,6 @@ RUN pip install -r requirements.txt
 
 ADD . /backend
 
-ENTRYPOINT ["python"]
-
-CMD ["/backend/run.py"]
+CMD ["/usr/local/bin/uwsgi", "--http","0.0.0.0:5000","--gevent","1000","--http-websockets","--master","--wsgi-file","run.py", "--callable","app"]
 
 EXPOSE 5000

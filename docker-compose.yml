@@ -11,6 +11,8 @@ services:
       - redis
     env_file:
       - .env
+    volumes:
+     - ./backend:/backend
 
   nginx:
     restart: always
@@ -22,6 +24,24 @@ services:
     build: ./frontend
     ports:
       - "8080:8080"
+    volumes:
+      - ./frontend:/src
+    environment:
+      - NODE_ENV=dev
+    # Before you run this file for the first time, make sure 
+    # you remove node_modules/ folders in your host machine
+    command: >
+      sh -c '
+      echo "installing node modules in container";
+      if test -d node_modules;
+      then
+        echo node_modules_exists ;
+      else
+        cp -a /tmp/node_modules /src;
+      fi && 
+      npm install &&
+      node server.js
+      '
 
   worker:
     build:
@@ -31,6 +51,8 @@ services:
       - redis
     env_file:
       - .env
+    volumes:
+      - ./celery:/celery
 
   monitor:
     build:
@@ -39,10 +61,11 @@ services:
     ports:
       - "5555:5555"
     entrypoint: flower
-    command: -A tasks --port=5555 --broker=redis://redis:6379/0
+    command: -A tasks --port=5555 --broker=redis://redis:6379/0 
     depends_on:
        - redis
-
+    volumes:
+       - ./celery:/celery
   redis:
     image: redis
     env_file:

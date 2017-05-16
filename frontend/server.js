@@ -4,7 +4,27 @@ var express = require('express');
 
 var app = express();
 
-app.use(express.static(__dirname + '/dist'));
+const isDeveloping = process.env.NODE_ENV !== "production";
+
+if (isDeveloping) {
+
+  let webpack = require('webpack');
+  let webpackMiddleware = require('webpack-dev-middleware');
+  let webpackHotMiddleware = require('webpack-hot-middleware');
+  let webpackConfig = require('./webpack.config');
+  let compiler = webpack(webpackConfig);
+
+  // serve the content using webpack
+  app.use(require("webpack-dev-middleware")(compiler, {
+    noInfo: true, publicPath: webpackConfig.output.publicPath
+  }));
+  app.use(webpackHotMiddleware(compiler));
+
+} else {
+  // serve the content using static directory
+  app.use(express.static(__dirname + '/dist'));
+}
+
 
 app.get('/', function(req, res) {
   app.use(express.static(__dirname, '/dist'));
@@ -20,3 +40,5 @@ var server = app.listen(
     console.log('Press Ctrl+C to quit.');
   }
 );
+
+
