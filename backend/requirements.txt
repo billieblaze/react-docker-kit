@@ -5,3 +5,4 @@ redis
 gevent
 flask-cors
 nose
+uwsgi

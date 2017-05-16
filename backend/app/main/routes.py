@@ -1,29 +1,74 @@
 from . import main
 import time
+import json
 from flask import session, redirect, url_for, render_template, request, url_for, jsonify
 from worker import celery
 from celery.task.control import inspect, revoke
 import celery.states as states
 from flask_cors import CORS, cross_origin
+from redis import Redis
 
 from .. import socketio
 
+redis = Redis(host='redis', port=6379)
 
 @main.route('/')
 def hello():
     return "You should be using the SPA entry. But you can <a href='/add/1/2'>try me out</a>."
 
+## format for data 
+sensor_hits_collection = {"type": "FeatureCollection", "features": [
+ {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [70,30]
+                    },
+                    "properties": {
+                        "title": "Sensor",
+                        "icon": {
+                            "iconUrl": 'http://a.tiles.mapbox.com/v3/marker/pin-l-embassy+f86767.png',
+                        }
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [30,70]
+                    },
+                    "properties": {
+                        "title": "Sensor",
+                        "icon": {
+                            "iconUrl": 'http://a.tiles.mapbox.com/v3/marker/pin-l-embassy+f86767.png',
+                        }
+                    }
+                }
+]}
+
+## routes
+@main.route('/ping')
+def ping():
+    count = redis.incr('hits')
+    return 'Hello World! I have been seen {} times.\n'.format(count)
+
+
+@main.route("/sensors")
+def sensors():
+    return json.dumps(sensor_hits_collection);
+
+
 
 # echo for connection confirmation
-@socketio.on('connect', namespace='/cruncher')
+@socketio.on('connect', namespace='/mapper')
 def connect():
-    socketio.emit('connected', {'hello': 'there'}, namespace='/cruncher')
+    socketio.emit('connected', {'hello': 'there'}, namespace='/mapper')
     print 'connected to client'
 
 
-@socketio.on('disconnect', namespace='/cruncher')
+@socketio.on('disconnect', namespace='/mapper')
 def connect():
-    socketio.emit('disconnected', namespace='/cruncher')
+    socketio.emit('disconnected', namespace='/mapper')
     print 'disconnected to client'
 
 
@@ -41,16 +86,16 @@ def add(param1, param2):
     task = celery.send_task('mytasks.add', args=[param1, param2], kwargs={})
 
     # initiate progress
-    socketio.emit('progress', {'status': 10}, namespace='/cruncher')
+    socketio.emit('progress', {'status': 10}, namespace='/mapper')
     time.sleep(1)
 
     # check progress
     res = celery.AsyncResult(task.id)
     if res.state == states.PENDING:
-        socketio.emit('progress', {'status': 50}, namespace='/cruncher')
+        socketio.emit('progress', {'status': 50}, namespace='/mapper')
     time.sleep(2)
     #clientId.socketio.emit('progress', {'status': 100, 'result': str(res.result)}, namespace='/cruncher')
-    socketio.emit('progress', {'status': 100, 'result': str(res.result)}, namespace='/cruncher')
+    socketio.emit('progress', {'status': 100, 'result': str(res.result)}, namespace='/mapper')
     return jsonify(task_id=task.id, status_url=url_for('main.check_task', id=task.id, _external=True))
 
 

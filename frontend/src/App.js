@@ -1,12 +1,26 @@
+var WidthProvider = require('react-grid-layout').WidthProvider;
+var ReactGridLayout = require('react-grid-layout');
+ReactGridLayout = WidthProvider(ReactGridLayout);
+
 import autobind from 'autobind-decorator';
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+
 import io from 'socket.io-client';
 import Progress from './components/Progress';
+import {MapView} from './components/MapView';
+import {DataTable} from './components/DataTable';
+
+import { addTodo } from './actions/actions'
+
+import AddTodo from './components/AddTodo'
+import TodoList from './components/TodoList'
+
 
 import { serverUrl, port } from './config';
-let socket = io.connect(`${serverUrl}:${port}/cruncher`);
+let socket = io.connect(`${serverUrl}:${port}/mapper`);
 
-export default class App extends Component {
+class App extends Component {
   constructor () {
     super();
     socket.on('server:event', data => {
@@ -32,83 +46,60 @@ export default class App extends Component {
     }
   }
 
-  @autobind
-  _progress(e) {
-    console.info(e);
-    if (e && e.status) {
-     this.setState({
-       progress: e.status
-     });
-    }
-    if (e && e.status === 100) {
-      this.setState({
-       result: e.result
-     });
-    }
-  }
-
-  @autobind
-  _reset() {
-    this.setState({
-      result: 0
-    });
-  }
-
-  @autobind
-  _doAction(e) {
-    if (e) {
-      this._reset();
-      const { n1, n2 } = this.refs;
-      fetch(`${serverUrl}:${port}/add/${n1.value}/${n2.value}`, {
-        method: 'post'
-      }).then(function(response) {
-        console.info(response);
-      }).catch(function(err) {
-        console.info(err);
-      });
-        console.info('sending action: do crunching');
-      }
-  }
-
-  renderCalc() {
-    return (
-      <div>
-        <input type="text" ref="n1" defaultValue="0" className="flex-auto m1 field-light rounded-left"/>
-        <span>+</span>
-        <input type="text" ref="n2" defaultValue="1" className="flex-auto m1 field-light rounded-left"/>
-        <button onClick={this._doAction}>Do it!</button>
-      </div>
-    );
-  }
-
-  renderProgress(){
-    if (this.state.progress > 0 && this.state.progress < 100) {
+  renderHeader(){
       return (
-        <Progress status={this.state.progress} result={this.state.result} />
-      );
-    }
-    if (this.state.result > 0) {
-      return (
-        <div className="flex flex-center p2">
-          <div className="col-6 mx-auto">
-            <p className="m1">
-              Result: {this.state.result}
-            </p>
-          </div>
+        <div>
+        <h1>Rover Data Mapping</h1>
         </div>
       );
-    }
   }
 
+
   render() {
+    const { dispatch, visibleTodos } = this.props
+    // layout is an array of objects, see the demo for more complete usage
+    var layout = [
+      {i: 'a', x: 0, y: 0, w: 2, h: 4, static: true},
+      {i: 'b', x: 0, y: 4, w: 2, h: 4, static: true},
+      {i: 'c', x: 0, y: 8, w: 2, h: 4, static: true},
+      {i: 'd', x: 0, y: 12, w: 2, h: 4, static: true},
+      {i: 'e', x: 4, y: 0, w: 10, h: 2, static: true}
+    ];
+  
     return (
-      <div className="flex flex-center p2" style={{ minHeight: '100vh' }}>
-          <div className="bold p2 mx-auto bg-silver">
-            <h1 className="center">Number Cruncher</h1>
-            {this.renderCalc()}
-            {this.renderProgress()}
-          </div>
-      </div>
-    );
+    <div>
+     {this.renderHeader()}
+      <ReactGridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
+        <div key={'a'}>
+          <h2>Datatable</h2>
+          <DataTable />
+        </div>
+        
+        <div key={'b'}>
+          <h2>Todo</h2>
+          <AddTodo
+               onAddClick = {text =>
+               dispatch(addTodo(text))}
+            />
+        
+          <TodoList todos = {visibleTodos}/>
+        </div>
+        <div key={'e'}>
+          <h2>Map</h2>
+          <MapView />
+        </div>
+      </ReactGridLayout>
+     </div>
+
+    )
+
   }
 }
+
+function select(state) {
+   return {
+      visibleTodos: state.todos
+   }
+}
+
+export default connect(select)(App)
