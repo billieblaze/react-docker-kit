@@ -1,7 +1,0 @@
-@import 'basscss';
-
-.clearfix:before, .clearfix:after { content: ''; display: table; }
-
-.clearfix:after { clear: both; }
-
-.center { text-align: center; }
