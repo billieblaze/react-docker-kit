@@ -1,20 +1,22 @@
-import "babel-polyfill"
-import React from 'react';
-import { render } from 'react-dom';
-import { createStore, applyMiddleware } from 'redux'
-import { Provider } from 'react-redux'
+import React from 'react'
+import { render } from 'react-dom'
+import { browserHistory } from 'react-router'
+import { syncHistoryWithStore } from 'react-router-redux'
+import Root from './containers/Root'
+import configureStore from './store/configureStore'
 
-import App from './App';
-const root = document.getElementById('root');
+const store = configureStore()
+const history = syncHistoryWithStore(browserHistory, store)
 
-import todoApp from './reducers/reducers'
+// import injectTapEventPlugin from 'react-tap-event-plugin';
+// injectTapEventPlugin();
 
-const store = createStore(
-  todoApp,
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
+
+render(
+  <MuiThemeProvider>
+    <Root store={store} history={history} />
+  </MuiThemeProvider>,
+  document.getElementById('root')
 )
-console.log(store.getState())
-const action = type => store.dispatch({type})
-
-require('./style.css');
-
-render(<Provider store = {store}><App /></Provider>, root);

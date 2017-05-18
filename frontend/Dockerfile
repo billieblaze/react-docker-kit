@@ -10,7 +10,7 @@ RUN npm config set registry http://registry.npmjs.org/ && npm install
 COPY . /src
 WORKDIR /src
 
-RUN cp -a /tmp/node_modules /src
+RUN ln -s /tmp/node_modules /src/node_modules
 RUN npm run production
 
 ENV NODE_ENV=production

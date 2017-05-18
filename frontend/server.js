@@ -26,10 +26,6 @@ if (isDeveloping) {
 }
 
 
-app.get('/', function(req, res) {
-  app.use(express.static(__dirname, '/dist'));
-});
-
 var server = app.listen(
   process.env.PORT || 8080,
   '0.0.0.0',

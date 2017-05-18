@@ -25,9 +25,9 @@ module.exports = {
     root: path.join(__dirname, 'src'),
     modules: ['node_modules', 'src'],
     alias: {
-      'react-grid-layout': path.join(__dirname, '/src/node_modules/react-grid-layout/css/styles.css'),
-      'react-resizable': path.join(__dirname, '/src/node_modules/react-resizable/css/styles.css'),
-      'leaflet': path.join(__dirname, '/src/node_modules/leaflet/dist/leaflet.css')
+      // 'react-grid-layout': path.join(__dirname, 'node_modules/react-grid-layout/css/styles.css'),
+      // 'react-resizable': path.join(__dirname, 'node_modules/react-resizable/css/styles.css'),
+      //'leaflet': path.join(__dirname, 'node_modules/leaflet/dist/leaflet.css')
      }
   },
   plugins: [
@@ -36,7 +36,7 @@ module.exports = {
     ]),
     new HtmlWebpackPlugin({
       inject: true,
-      template: 'src/index.html'
+      template: 'public/index.html'
     }),
     // OccurenceOrderPlugin is needed for webpack 1.x only
     new webpack.optimize.OccurenceOrderPlugin(),

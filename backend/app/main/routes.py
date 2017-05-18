@@ -12,11 +12,11 @@ from .. import socketio
 
 redis = Redis(host='redis', port=6379)
 
-@main.route('/')
+@main.route('/api')
 def hello():
     return "You should be using the SPA entry. But you can <a href='/add/1/2'>try me out</a>."
 
-## format for data 
+## format for data
 sensor_hits_collection = {"type": "FeatureCollection", "features": [
  {
                     "type": "Feature",
@@ -47,16 +47,21 @@ sensor_hits_collection = {"type": "FeatureCollection", "features": [
 ]}
 
 ## routes
-@main.route('/ping')
+@main.route('/api/ping')
 def ping():
     count = redis.incr('hits')
     return 'Hello World! I have been seen {} times.\n'.format(count)
 
 
-@main.route("/sensors")
+@main.route("/api/sensors")
 def sensors():
     return json.dumps(sensor_hits_collection);
 
+@main.route("/api/sensor_hit")
+def sensor_hit():
+    message = {'type': 'distance', 'value': '5', 'time': '11/1/2017 12:01:12.2', 'location': {'latitude': 25, 'longitude': -80}}
+    socketio.emit('message',message , namespace='/mapper')
+    return "{'OK':'True'}"
 
 
 # echo for connection confirmation
@@ -72,7 +77,7 @@ def connect():
     print 'disconnected to client'
 
 
-@main.route('/list')
+@main.route('/api/list')
 def list():
     i = inspect()
     print i.registered_tasks()
@@ -80,7 +85,7 @@ def list():
 
 
 @cross_origin()
-@main.route('/add/<int:param1>/<int:param2>', methods=['GET', 'POST'])
+@main.route('/api/add/<int:param1>/<int:param2>', methods=['GET', 'POST'])
 def add(param1, param2):
     #clientId = request.sid
     task = celery.send_task('mytasks.add', args=[param1, param2], kwargs={})
@@ -99,7 +104,7 @@ def add(param1, param2):
     return jsonify(task_id=task.id, status_url=url_for('main.check_task', id=task.id, _external=True))
 
 
-@main.route('/check/<string:id>')
+@main.route('/api/check/<string:id>')
 def check_task(id):
     res = celery.AsyncResult(id)
     if res.state == states.PENDING:
@@ -108,7 +113,7 @@ def check_task(id):
         return str(res.result)
 
 
-@main.route('/cancel/<string:id>')
+@main.route('/api/cancel/<string:id>')
 def cancel_task(id):
     res = celery.AsyncResult(id)
     if res.state == states.PENDING:
