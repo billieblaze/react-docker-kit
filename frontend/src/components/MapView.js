@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { Map, TileLayer } from 'react-leaflet'
+
+import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+
 import {
   Table,
   TableBody,
@@ -10,12 +12,14 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 
-const position = [35.9940, -78.8986]
+const location = [35.9940, -78.8986]
 
 export class MapView extends Component {
   constructor(props) {
-    console.log(props)
+
     super(props)
+    console.log(this.props)
+
   }
 
   componentDidMount() {
@@ -25,13 +29,14 @@ export class MapView extends Component {
   render() {
     return (
       <div>
-        <Map
-          style={{height: "100vh"}}
-          center={position}
-          zoom={10}>
-          <TileLayer
-            url="https://api.mapbox.com/styles/v1/billieblaze/cj2p24sh0001a2rqtugfmqyrq/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmlsbGllYmxhemUiLCJhIjoiY2oxamkxM2s1MDIxeTMyb3Y5MjJlYmU4dCJ9.YJrBCv_97Dm2eCN8eXecww"
-            attribution="© Mapbox © OpenStreetMap © DigitalGlobe" />
+         <Map center={[0,0]} zoom={1} style={{ height: '400px', marginBottom: '20px' }}>
+          <TileLayer url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
+          {this.props.messages.map(message => (
+            <Marker key={message.timestamp} position={message.location}>
+              <Popup>
+                <span>{message.type}<br/>{message.value}</span>
+              </Popup>
+            </Marker>))}
         </Map>
 
         <Table>
@@ -51,7 +56,7 @@ export class MapView extends Component {
               <TableRowColumn>{row.time}</TableRowColumn>
               <TableRowColumn>{row.type}</TableRowColumn>
               <TableRowColumn>{row.value}</TableRowColumn>
-              <TableRowColumn>{row.location.latitude}, {row.location.latitude}</TableRowColumn>
+              <TableRowColumn>{row.location[0]}, {row.location[1]}</TableRowColumn>
             </TableRow>
             ))}
 
@@ -64,7 +69,8 @@ export class MapView extends Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
-  messages: state.messages
+  messages: state.messages,
+  currentMessage: state.currentMessage
 })
 
 export default connect(mapStateToProps)(MapView)

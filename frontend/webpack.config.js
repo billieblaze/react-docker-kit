@@ -27,7 +27,7 @@ module.exports = {
     alias: {
       // 'react-grid-layout': path.join(__dirname, 'node_modules/react-grid-layout/css/styles.css'),
       // 'react-resizable': path.join(__dirname, 'node_modules/react-resizable/css/styles.css'),
-      //'leaflet': path.join(__dirname, 'node_modules/leaflet/dist/leaflet.css')
+      'leaflet': path.join(__dirname, 'node_modules/leaflet/dist/leaflet.css')
      }
   },
   plugins: [
