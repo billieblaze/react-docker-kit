@@ -59,6 +59,7 @@ import {CONNECT_MESSAGE, DISCONNECT_MESSAGE, INCOMING_MESSAGE} from '../actions'
       //case CONNECT_MESSAGE:
 
       case INCOMING_MESSAGE:
+console.log('reducer', action.message)
         messages.push(action.message);
         break;
     }
@@ -71,6 +72,7 @@ import {CONNECT_MESSAGE, DISCONNECT_MESSAGE, INCOMING_MESSAGE} from '../actions'
       case CONNECT_MESSAGE:
         return action.message;
       case INCOMING_MESSAGE:
+      console.log('reducer', action.message)
         return action.message;
       default:
         return currentMessage;

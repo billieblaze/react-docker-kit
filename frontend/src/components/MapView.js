@@ -56,7 +56,7 @@ export class MapView extends Component {
               <TableRowColumn>{row.time}</TableRowColumn>
               <TableRowColumn>{row.type}</TableRowColumn>
               <TableRowColumn>{row.value}</TableRowColumn>
-              <TableRowColumn>{row.location[0]}, {row.location[1]}</TableRowColumn>
+              <TableRowColumn>{row.message.data.location.latitude}, {row.message.data.location.longitude}</TableRowColumn>
             </TableRow>
             ))}
 

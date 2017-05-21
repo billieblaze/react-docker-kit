@@ -6,3 +6,5 @@ gevent
 flask-cors
 nose
 uwsgi
+
+paho-mqtt

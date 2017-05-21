@@ -57,9 +57,17 @@ def ping():
 def sensors():
     return json.dumps(sensor_hits_collection);
 
+
 @main.route("/api/sensor_hit")
 def sensor_hit():
-    message = {'type': 'distance', 'value': '5', 'time': '11/1/2017 12:01:12.2', 'location': {'latitude': 25, 'longitude': -80}}
+    # todo: update this to use the ROS packets from MQTT's format
+    message = {'type': 'distance', 'value': '5', 'time': '11/1/2017 12:01:12.2', 'location': [ 30, -80 ]}
+    socketio.emit('message',message , namespace='/mapper')
+    return "{'OK':'True'}"
+
+@main.route("/api/location")
+def location():
+    message = {'type': 'location', 'time': '11/1/2017 12:01:12.2', 'location': [25, 30]}
     socketio.emit('message',message , namespace='/mapper')
     return "{'OK':'True'}"
 
