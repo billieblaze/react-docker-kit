@@ -18,7 +18,7 @@ export class MapView extends Component {
   constructor(props) {
 
     super(props)
-    console.log(this.props)
+    // console.log(this.props)
 
   }
 
@@ -32,11 +32,13 @@ export class MapView extends Component {
          <Map center={[0,0]} zoom={1} style={{ height: '400px', marginBottom: '20px' }}>
           <TileLayer url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
           {this.props.messages.map(message => (
-            <Marker key={message.timestamp} position={message.location}>
+            <Marker key={message.timestamp} position={[message.location.latitude, message.location.longitude]}>
               <Popup>
                 <span>{message.type}<br/>{message.value}</span>
               </Popup>
             </Marker>))}
+          {/*}  <Marker key={"rover"} position={[this.props.currentLocation.latitude, this.props.currentLocation.longitude]}>
+            </Marker>*/}
         </Map>
 
         <Table>
@@ -55,8 +57,8 @@ export class MapView extends Component {
               <TableRowColumn>{row.id}</TableRowColumn>
               <TableRowColumn>{row.time}</TableRowColumn>
               <TableRowColumn>{row.type}</TableRowColumn>
-              <TableRowColumn>{row.value}</TableRowColumn>
-              <TableRowColumn>{row.message.data.location.latitude}, {row.message.data.location.longitude}</TableRowColumn>
+              <TableRowColumn>{row.range.header.frame_id}</TableRowColumn>
+              <TableRowColumn>{row.location.latitude}, {row.location.longitude}</TableRowColumn>
             </TableRow>
             ))}
 
@@ -70,7 +72,7 @@ export class MapView extends Component {
 
 const mapStateToProps = (state, ownProps) => ({
   messages: state.messages,
-  currentMessage: state.currentMessage
+  currentLocation: state.currentLocation
 })
 
 export default connect(mapStateToProps)(MapView)

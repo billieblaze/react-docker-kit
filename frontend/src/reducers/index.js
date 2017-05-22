@@ -59,23 +59,27 @@ import {CONNECT_MESSAGE, DISCONNECT_MESSAGE, INCOMING_MESSAGE} from '../actions'
       //case CONNECT_MESSAGE:
 
       case INCOMING_MESSAGE:
-console.log('reducer', action.message)
-        messages.push(action.message);
+        if(action.message.type == 'range_location'){
+          messages.push(action.message);
+        }
         break;
     }
 
     return messages;
   }
 
-  function currentMessage(currentMessage="", action) {
+  function currentLocation(location="", action) {
     switch(action.type) {
-      case CONNECT_MESSAGE:
-        return action.message;
+
       case INCOMING_MESSAGE:
-      console.log('reducer', action.message)
-        return action.message;
+      console.log(action)
+        if(action.message.type == 'current_location'){
+          return action.message
+        } else {
+          return location;
+        }
       default:
-        return currentMessage;
+        return location;
     }
   }
 
@@ -87,7 +91,7 @@ const rootReducer = combineReducers({
   errorMessage,
   routing,
   messages,
-  currentMessage
+  currentLocation
 })
 
 export default rootReducer

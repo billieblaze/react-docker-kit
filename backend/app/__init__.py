@@ -28,8 +28,10 @@ def on_message(msq, obj, msg):
  print "Topic: " + str(msg.topic)
  # print "QoS: " + str(msg.qos)
  #print "Payload: " + str(msg.payload)
+
  message = json.loads(msg.payload)
- 
+ message["type"] = str(msg.topic)
+
 # message = ()
  socketio.emit('message', message, broadcast=True, namespace='/mapper')
 
